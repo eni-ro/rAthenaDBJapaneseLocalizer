@@ -1,6 +1,5 @@
 # -*- encoding: utf-8 -*-
 require 'gtk3'
-require 'yaml'
 
 builder = Gtk::Builder.new(file: 'ui.glade')
 
@@ -51,7 +50,7 @@ def on_btn_auriga_clicked
 end
 
 def on_btn_apply_clicked
-	if !File.exist?( $auriga_path ) || !File.exist?( $rathena_path )
+	if !file_is_exist()
 		md = Gtk::MessageDialog.new(:parent => nil, :type => :info, :buttons_type => :close, :message => "File not found")
 		md.signal_connect("response") do |widget, response|
 			md.destroy
@@ -59,6 +58,27 @@ def on_btn_apply_clicked
 		md.show_all
 		return
 	end
+
+	translate( true )
+	
+	md = Gtk::MessageDialog.new(:parent => nil, :flags => :destroy_with_parent,
+		:type => :info, :buttons_type => :close, 
+		:message => "Successfully applied")
+	md.signal_connect("response") do |widget, response|
+		md.destroy
+		#複数ファイルを置換するのでメインは閉じない
+	end
+	md.show_all
+end
+
+def file_is_exist
+	if !File.exist?( $auriga_path ) || !File.exist?( $rathena_path )
+		return false
+	end
+	return true
+end
+
+def translate( backup )
 	db={}
 	re = Regexp.new('^(//)?(\d+),[^,]*,([^,]*)')
 	File.open($auriga_path, mode = "rt", encoding: 'cp932'){|f|
@@ -68,8 +88,8 @@ def on_btn_apply_clicked
 			end
 		}
 	}
-	#元のコメント等の書式を維持するため、YAML形式の読み込みはせずに1行ずつ処理する
 	File.rename($rathena_path, $rathena_path+'.bak')
+	#元のコメント等の書式を維持するため、YAML形式の読み込みはせずに1行ずつ処理する
 	File.open($rathena_path, mode = "w", encoding: 'cp932') do |out_f|
 		File.open($rathena_path+'.bak', mode = "rt", encoding: 'cp932'){|f|
 			id = -1
@@ -87,16 +107,27 @@ def on_btn_apply_clicked
 			}
 		}
 	end
-	md = Gtk::MessageDialog.new(:parent => nil, :flags => :destroy_with_parent,
-		:type => :info, :buttons_type => :close, 
-		:message => "Successfully applied")
-	md.signal_connect("response") do |widget, response|
-		md.destroy
-		#複数ファイルを置換するのでメインは閉じない
+	if !backup
+		File.delete($rathena_path+'.bak')
 	end
-	md.show_all
 end
 
+if ARGV.size()  >= 2
+	backup = true
+	if ARGV.include?('--nobackup')
+		backup = false
+		ARGV.delete('--nobackup')
+	end
+	if ARGV.size() == 2
+		$rathena_path = ARGV[0]
+		$auriga_path = ARGV[1]
+		if file_is_exist()
+			translate( backup )
+			exit 0
+		end
+	end
+
+end
 builder.connect_signals { |handler| method(handler) } # handler は String
 
 $win.show_all
