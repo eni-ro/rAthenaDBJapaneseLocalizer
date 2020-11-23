@@ -1,5 +1,5 @@
 # rAthenaDB Japanese Localizer
-rAthenaとItemDBとMobDBの登録名を、Aurigaのデータを利用して日本語化するだけのツールです  
+rAthenaとItemDBとMobDBの登録名を、クライアント/Aurigaのデータを利用して日本語化するだけのツールです  
 
 ## 環境
 * Ruby  
@@ -23,7 +23,8 @@ mobdb_localizer.rbで以下のファイルを選択する
 |.\db\re\mob_db.txt|.\db\mob_db.txt|
 
 ### ItemDB
-itemdb_localizer.rbで以下のファイルを選択する
+itemdb_localizer.rbでidnum2itemdisplaynametable.txtをファイルを選択する  
+idnum2itemdisplaynametable.txtは[GrfEditor](https://rathena.org/board/files/file/2766-grf-editor/)を使用してdata.grfから抽出しておく  
 |rAthena|Auriga|
 |---|---|
-|.\db\re\item_db_equip.yml<br>.\db\re\item_db_etc.yml<br>.\db\re\item_db_usable.yml|.\db\item_db.txt|
+|.\db\re\item_db_equip.yml<br>.\db\re\item_db_etc.yml<br>.\db\re\item_db_usable.yml|data\idnum2itemdisplaynametable.txt|

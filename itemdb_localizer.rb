@@ -80,11 +80,11 @@ end
 
 def translate( backup )
 	db={}
-	re = Regexp.new('^(//)?(\d+),[^,]*,([^,]*)')
+	re = Regexp.new('^(\d+)#(.*)#')
 	File.open($auriga_path, mode = "rt", encoding: 'cp932'){|f|
 		f.each_line{|line|
 			if m = re.match(line)
-				db[m[2]]=m[3]
+				db[m[1]]=m[2]
 			end
 		}
 	}
